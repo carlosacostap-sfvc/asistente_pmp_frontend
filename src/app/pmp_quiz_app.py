@@ -4,6 +4,7 @@ from typing import Optional
 from src.models.question import Question
 from src.models.quiz_session import QuizSession
 from src.services.api_service import api_service
+from src.ui.views.auth_view import AuthView
 from src.ui.views.main_view import MainView
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
@@ -17,6 +18,10 @@ class PMPQuizApp:
         self.quiz_session: Optional[QuizSession] = None
 
         # Initialize views
+        self.auth_view = AuthView(
+            on_login_success=self.handle_login_success,
+            on_signup_success=self.handle_signup_success
+        )
         self.main_view = MainView(
             on_practice=self.handle_practice
         )
@@ -30,7 +35,7 @@ class PMPQuizApp:
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
-        """Muestra la vista principal."""
+        """Muestra la vista principal o la vista de autenticación según corresponda."""
         if page is None and hasattr(self, 'page'):
             page = self.page
         elif isinstance(page, ft.Page):
@@ -41,10 +46,22 @@ class PMPQuizApp:
         else:
             raise ValueError("No se pudo obtener una referencia válida a la página")
 
-        # Reiniciar sesión
+        if not api_service.current_user:
+            self.auth_view.build(page)
+            return
+
+        # Si está autenticado, muestra la vista principal
         self.quiz_session = None
         hide_loading(page)
         self.main_view.build(page)
+
+    async def handle_login_success(self, e):
+        """Maneja el evento de login exitoso."""
+        self.show_main_view(e)
+
+    async def handle_signup_success(self, e):
+        """Maneja el evento de registro exitoso."""
+        self.show_main_view(e)
 
     async def handle_practice(self, e, domain: str):
         """Maneja la selección de práctica por dominio."""
@@ -52,6 +69,11 @@ class PMPQuizApp:
         show_loading(page)
 
         try:
+            # Verificar autenticación
+            if not api_service.current_user:
+                self.show_main_view(page)
+                return
+
             # Iniciar nueva sesión
             self.quiz_session = QuizSession(
                 start_time=datetime.now(),
@@ -78,6 +100,11 @@ class PMPQuizApp:
         show_loading(page)
 
         try:
+            # Verificar autenticación
+            if not api_service.current_user:
+                self.show_main_view(page)
+                return
+
             question = await api_service.get_single_question(domain)
             if question:
                 self.current_question = question
@@ -93,6 +120,12 @@ class PMPQuizApp:
     async def handle_finish_practice(self, e):
         """Maneja el evento de finalizar práctica."""
         page = e.page
+
+        # Verificar autenticación
+        if not api_service.current_user:
+            self.show_main_view(page)
+            return
+
         if self.quiz_session and self.quiz_session.answers:
             show_loading(page)
             try:

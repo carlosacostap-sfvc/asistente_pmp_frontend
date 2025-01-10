@@ -1,14 +1,13 @@
 import flet as ft
 
-
-def create_title(text: str, size: int = 32) -> ft.Text:
+def create_title(text: str, size: int = 32, color: str = ft.colors.BLUE_GREY_900) -> ft.Text:
     """Crea un título con el estilo estándar de la aplicación."""
     return ft.Text(
         value=text,
         size=size,
         weight=ft.FontWeight.BOLD,
+        color=color,
     )
-
 
 def create_button(
         text: str,
@@ -36,7 +35,6 @@ def create_button(
         ),
     )
 
-
 def create_container(content: ft.Control, padding: int = 50) -> ft.Container:
     """Crea un contenedor con el estilo estándar de la aplicación."""
     return ft.Container(
@@ -50,7 +48,6 @@ def create_container(content: ft.Control, padding: int = 50) -> ft.Container:
             color=ft.colors.BLACK12,
         ),
     )
-
 
 def show_loading(page: ft.Page):
     """Muestra un indicador de carga en la parte superior."""
@@ -94,14 +91,12 @@ def show_loading(page: ft.Page):
     page.controls.insert(0, loading_banner)
     page.update()
 
-
 def hide_loading(page: ft.Page):
     """Oculta el indicador de carga."""
     if hasattr(page, 'loading_banner'):
         page.controls.remove(page.loading_banner)
         delattr(page, 'loading_banner')
         page.update()
-
 
 def show_error_message(page: ft.Page, message: str):
     """Muestra un mensaje de error en la página."""
@@ -114,7 +109,6 @@ def show_error_message(page: ft.Page, message: str):
         ]
     )
     page.show_banner(error_banner)
-
 
 def hide_error_message(page: ft.Page):
     """Oculta el mensaje de error."""

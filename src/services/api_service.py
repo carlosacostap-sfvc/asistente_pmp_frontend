@@ -3,6 +3,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 from src.models.question import Question, Option
 from src.models.quiz_session import QuizSession
+from src.models.user import User
 from src.config.settings import settings
 
 
@@ -10,14 +11,77 @@ class APIService:
     def __init__(self):
         self.base_url = settings.API_URL
         self.timeout = settings.API_TIMEOUT
+        self.current_user: Optional[User] = None
+
+    async def signup(self, email: str, password: str) -> tuple[bool, str]:
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/auth/signup",
+                    json={"email": email, "password": password}
+                )
+                if response.status_code == 200:
+                    return True, ""
+                return False, response.json().get("detail", "Error en el registro")
+        except Exception as e:
+            return False, str(e)
+
+    async def login(self, email: str, password: str) -> tuple[bool, str]:
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/auth/token",
+                    data={"username": email, "password": password}
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    self.current_user = User(
+                        email=email,
+                        access_token=data["access_token"],
+                        is_authenticated=True
+                    )
+                    return True, ""
+                return False, response.json().get("detail", "Error en el login")
+        except Exception as e:
+            return False, str(e)
+
+    async def get_current_user(self) -> Optional[User]:
+        if not self.current_user or not self.current_user.access_token:
+            return None
+
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.get(
+                    f"{self.base_url}/auth/me",
+                    headers={"Authorization": f"Bearer {self.current_user.access_token}"}
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    return User(
+                        email=data["email"],
+                        access_token=self.current_user.access_token,
+                        is_authenticated=True
+                    )
+                return None
+        except Exception:
+            return None
+
+    def logout(self):
+        self.current_user = None
 
     async def get_single_question(self, domain: str) -> Optional[Question]:
         """Obtiene una única pregunta del API."""
         try:
+            headers = {}
+            if self.current_user and self.current_user.access_token:
+                headers["Authorization"] = f"Bearer {self.current_user.access_token}"
+
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
                     f"{self.base_url}/question",
-                    params={"domain": domain}
+                    params={"domain": domain},
+                    headers=headers
                 )
                 data = response.json()
 
@@ -34,6 +98,10 @@ class APIService:
             # Obtener estadísticas por dominio
             stats = session.get_stats_by_domain()
 
+            headers = {}
+            if self.current_user and self.current_user.access_token:
+                headers["Authorization"] = f"Bearer {self.current_user.access_token}"
+
             # Preparar datos para enviar al API
             session_data = {
                 "start_time": session.start_time.isoformat(),
@@ -49,12 +117,11 @@ class APIService:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/practice-sessions",
-                    json=session_data
+                    json=session_data,
+                    headers=headers
                 )
 
-                if response.status_code == 200:
-                    return True
-                return False
+                return response.status_code == 200
 
         except Exception as e:
             print(f"Error guardando la sesión: {e}")
@@ -70,4 +137,5 @@ class APIService:
         )
 
 
+# Crear instancia global del servicio
 api_service = APIService()
