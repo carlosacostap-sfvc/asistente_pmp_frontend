@@ -8,6 +8,8 @@ from src.ui.views.auth_view import AuthView
 from src.ui.views.main_view import MainView
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
+from src.ui.views.selection_view import SelectionView
+from src.ui.views.chat_view import ChatView
 from src.ui.components import show_loading, hide_loading, show_error_message
 
 
@@ -22,16 +24,24 @@ class PMPQuizApp:
             on_login_success=self.handle_login_success,
             on_signup_success=self.handle_signup_success
         )
+        self.selection_view = SelectionView(
+            on_practice_selected=self.handle_practice,
+            on_chat_selected=self.show_chat_view,
+            on_logout=self.handle_logout
+        )
         self.main_view = MainView(
             on_practice=self.handle_practice
         )
         self.question_view = QuestionView(
             on_next_question=self.handle_next_question,
-            on_return_home=self.show_main_view,
+            on_return_home=self.show_selection_view,
             on_finish_practice=self.handle_finish_practice
         )
         self.results_view = ResultsView(
-            on_return_home=self.show_main_view
+            on_return_home=self.show_selection_view
+        )
+        self.chat_view = ChatView(
+            on_return_home=self.show_selection_view
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
@@ -40,7 +50,7 @@ class PMPQuizApp:
             page = self.page
         elif isinstance(page, ft.Page):
             self.page = page
-        elif hasattr(page, 'page'):  # Si es un evento
+        elif hasattr(page, 'page'):
             self.page = page.page
             page = self.page
         else:
@@ -50,17 +60,38 @@ class PMPQuizApp:
             self.auth_view.build(page)
             return
 
-        # Si está autenticado, muestra la vista principal
+        # Si está autenticado, muestra la vista de selección
+        self.show_selection_view(page)
+
+    def show_selection_view(self, page: Optional[ft.Page] = None):
+        """Muestra la vista de selección entre chat y práctica."""
+        if isinstance(page, ft.Page):
+            self.page = page
+        elif hasattr(page, 'page'):
+            self.page = page.page
+            page = self.page
+
         self.quiz_session = None
         hide_loading(page)
-        self.main_view.build(page)
+        self.selection_view.build(page)
+
+    def show_chat_view(self, e):
+        """Muestra la vista de chat."""
+        page = e.page if hasattr(e, 'page') else self.page
+        hide_loading(page)
+        self.chat_view.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""
-        self.show_main_view(e)
+        self.show_selection_view(e)
 
     async def handle_signup_success(self, e):
         """Maneja el evento de registro exitoso."""
+        self.show_selection_view(e)
+
+    async def handle_logout(self, e):
+        """Maneja el evento de cerrar sesión."""
+        api_service.logout()
         self.show_main_view(e)
 
     async def handle_practice(self, e, domain: str):

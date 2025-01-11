@@ -50,7 +50,7 @@ def create_container(content: ft.Control, padding: int = 50) -> ft.Container:
     )
 
 def show_loading(page: ft.Page):
-    """Muestra un indicador de carga en la parte superior."""
+    """Muestra un indicador de carga."""
     loading_banner = ft.Container(
         content=ft.Row(
             controls=[
@@ -82,12 +82,9 @@ def show_loading(page: ft.Page):
         ),
     )
 
-    # Asegurarnos de que no haya otro banner de carga
     if hasattr(page, 'loading_banner'):
         page.controls.remove(page.loading_banner)
     page.loading_banner = loading_banner
-
-    # Insertar el banner al inicio de los controles
     page.controls.insert(0, loading_banner)
     page.update()
 
@@ -99,7 +96,7 @@ def hide_loading(page: ft.Page):
         page.update()
 
 def show_error_message(page: ft.Page, message: str):
-    """Muestra un mensaje de error en la página."""
+    """Muestra un mensaje de error."""
     error_banner = ft.Banner(
         bgcolor=ft.colors.RED_100,
         leading=ft.Icon(ft.icons.ERROR_OUTLINE, color=ft.colors.RED, size=40),
