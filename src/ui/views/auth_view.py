@@ -108,31 +108,55 @@ class AuthView:
         page.update()
 
     async def handle_login(self, e):
+        """Maneja el proceso de login."""
         try:
             from src.services.api_service import api_service
+            from src.ui.components import show_loading, hide_loading
+
+            # Mostrar indicador de carga
+            show_loading(self.page)
+
             success, error = await api_service.login(
                 self.email_field.value,
                 self.password_field.value
             )
+
+            # Ocultar indicador de carga
+            hide_loading(self.page)
+
             if success:
                 # Es importante esperar a que el callback se complete
                 await self.on_login_success(e)
             else:
                 show_error_message(self.page, f"Error al iniciar sesión: {error}")
         except Exception as ex:
+            # Asegurar que se oculte el loading incluso si hay error
+            hide_loading(self.page)
             show_error_message(self.page, f"Error inesperado: {str(ex)}")
 
     async def handle_signup(self, e):
+        """Maneja el proceso de registro."""
         try:
             from src.services.api_service import api_service
+            from src.ui.components import show_loading, hide_loading
+
+            # Mostrar indicador de carga
+            show_loading(self.page)
+
             success, error = await api_service.signup(
                 self.email_field.value,
                 self.password_field.value
             )
+
+            # Ocultar indicador de carga
+            hide_loading(self.page)
+
             if success:
                 # Es importante esperar a que el callback se complete
                 await self.on_signup_success(e)
             else:
                 show_error_message(self.page, f"Error al registrarse: {error}")
         except Exception as ex:
+            # Asegurar que se oculte el loading incluso si hay error
+            hide_loading(self.page)
             show_error_message(self.page, f"Error inesperado: {str(ex)}")
