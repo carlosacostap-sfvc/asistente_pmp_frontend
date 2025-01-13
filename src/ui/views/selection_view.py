@@ -1,3 +1,4 @@
+# En selection_view.py
 import flet as ft
 from src.ui.components import create_title, create_container, create_button
 
@@ -23,7 +24,7 @@ class SelectionView:
         # Crear botones de opción
         practice_button = create_button(
             text="Práctica PMP",
-            on_click=self.handle_practice,
+            on_click=self.handle_practice,  # Ya no necesitamos el lambda aquí
             bgcolor=ft.colors.BLUE,
             color=ft.colors.WHITE,
         )
@@ -63,14 +64,14 @@ class SelectionView:
         page.add(container)
         page.update()
 
-    def handle_practice(self, e):
-        """No necesita ser async porque handle_practice ya lo es"""
-        self.on_practice_selected(e, "aleatorio")  # O el dominio que prefieras por defecto
+    async def handle_practice(self, e):
+        """Ahora es una corrutina async"""
+        await self.on_practice_selected(e)
 
     def handle_chat(self, e):
         """No necesita ser async porque show_chat_view no es async"""
         self.on_chat_selected(e)
 
-    def handle_logout(self, e):
-        """No necesita ser async porque handle_logout ya lo es"""
-        self.on_logout(e)
+    async def handle_logout(self, e):
+        """Necesita ser async porque handle_logout es async"""
+        await self.on_logout(e)

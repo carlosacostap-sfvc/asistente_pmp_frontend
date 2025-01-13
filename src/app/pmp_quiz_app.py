@@ -11,6 +11,7 @@ from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
 from src.ui.views.chat_view import ChatView
 from src.ui.components import show_loading, hide_loading, show_error_message
+from src.ui.views.practice_intro_view import PracticeIntroView
 
 
 class PMPQuizApp:
@@ -25,7 +26,7 @@ class PMPQuizApp:
             on_signup_success=self.handle_signup_success
         )
         self.selection_view = SelectionView(
-            on_practice_selected=self.handle_practice,
+            on_practice_selected=self.handle_practice_selected,
             on_chat_selected=self.show_chat_view,
             on_logout=self.handle_logout
         )
@@ -42,6 +43,9 @@ class PMPQuizApp:
         )
         self.chat_view = ChatView(
             on_return_home=self.show_selection_view
+        )
+        self.practice_intro_view = PracticeIntroView(
+            on_start_practice=self.handle_practice
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
@@ -173,3 +177,7 @@ class PMPQuizApp:
             self.results_view.build(page, self.quiz_session)
         else:
             show_error_message(page, "No hay respuestas registradas para mostrar resultados")
+
+    async def handle_practice_selected(self, e):
+        """Maneja la selección de práctica mostrando la vista de introducción"""
+        self.practice_intro_view.build(e.page)

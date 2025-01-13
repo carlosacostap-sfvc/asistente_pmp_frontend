@@ -19,8 +19,12 @@ def create_button(
 ) -> ft.ElevatedButton:
     """Crea un botón con el estilo estándar de la aplicación."""
     if disabled:
-        bgcolor = ft.colors.GREY_400
-        color = ft.colors.GREY_200
+        # Incluso cuando está deshabilitado, mantenemos un color visible pero más suave
+        bgcolor = ft.colors.BLUE_200
+        color = ft.colors.WHITE
+    else:
+        bgcolor = bgcolor or ft.colors.BLUE
+        color = color or ft.colors.WHITE
 
     return ft.ElevatedButton(
         text=text,

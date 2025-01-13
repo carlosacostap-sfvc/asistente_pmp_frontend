@@ -5,7 +5,7 @@ from src.models.question import Question, Option
 from src.models.quiz_session import QuizSession
 from src.models.user import User
 from src.config.settings import settings
-
+import random
 
 class APIService:
     def __init__(self):
@@ -73,6 +73,10 @@ class APIService:
     async def get_single_question(self, domain: str) -> Optional[Question]:
         """Obtiene una única pregunta del API."""
         try:
+            # Si el dominio es aleatorio, seleccionamos uno al azar antes de hacer la petición
+            if domain == "aleatorio":
+                domain = random.choice(["personas", "proceso", "entorno"])
+
             headers = {}
             if self.current_user and self.current_user.access_token:
                 headers["Authorization"] = f"Bearer {self.current_user.access_token}"
@@ -85,7 +89,7 @@ class APIService:
                 )
                 data = response.json()
 
-                if data["success"] and data["data"]:
+                if data.get("data"):
                     return self._parse_question(data["data"])
                 return None
         except Exception as e:
