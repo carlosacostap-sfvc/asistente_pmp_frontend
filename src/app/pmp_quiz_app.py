@@ -11,8 +11,9 @@ from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
 from src.ui.views.chat_view import ChatView
 from src.ui.views.practice_intro_view import PracticeIntroView
-from src.ui.views.answer_view import AnswerView  # Importar la nueva vista
+from src.ui.views.answer_view import AnswerView
 from src.ui.components import show_loading, hide_loading, show_error_message
+from src.ui.views.progress_view import ProgressView
 
 
 class PMPQuizApp:
@@ -29,7 +30,11 @@ class PMPQuizApp:
         self.selection_view = SelectionView(
             on_practice_selected=self.handle_practice_selected,
             on_chat_selected=self.show_chat_view,
+            on_progress_selected=self.show_progress_view,
             on_logout=self.handle_logout
+        )
+        self.progress_view = ProgressView(
+            on_return_home=self.show_selection_view
         )
         self.main_view = MainView(
             on_practice=self.handle_practice
@@ -87,6 +92,12 @@ class PMPQuizApp:
         page = e.page if hasattr(e, 'page') else self.page
         hide_loading(page)
         self.chat_view.build(page)
+
+    def show_progress_view(self, e):
+        """Muestra la vista de progreso."""
+        page = e.page if hasattr(e, 'page') else self.page
+        hide_loading(page)
+        self.progress_view.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""
