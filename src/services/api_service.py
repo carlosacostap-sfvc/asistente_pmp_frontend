@@ -1,11 +1,12 @@
 import httpx
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from src.models.question import Question, Option
-from src.models.quiz_session import QuizSession
+from src.models.quiz_session import QuizSession, PracticeSession
 from src.models.user import User
 from src.config.settings import settings
 import random
+
 
 class APIService:
     def __init__(self):
@@ -45,7 +46,7 @@ class APIService:
 
                     self.current_user = User(
                         email=email,
-                        id=user_data["id"],  # Guardamos el ID del usuario
+                        id=user_data["id"],
                         access_token=data["access_token"],
                         is_authenticated=True
                     )
@@ -81,7 +82,6 @@ class APIService:
     async def get_single_question(self, domain: str) -> Optional[Question]:
         """Obtiene una única pregunta del API."""
         try:
-            # Si el dominio es aleatorio, seleccionamos uno al azar antes de hacer la petición
             if domain == "aleatorio":
                 domain = random.choice(["personas", "proceso", "entorno"])
 
@@ -104,23 +104,55 @@ class APIService:
             print(f"Error obteniendo pregunta: {e}")
             return None
 
+    async def get_user_practice_sessions(self, user_id: str) -> List[PracticeSession]:
+        """Obtiene todas las sesiones de práctica del usuario."""
+        try:
+            headers = {}
+            if self.current_user and self.current_user.access_token:
+                headers["Authorization"] = f"Bearer {self.current_user.access_token}"
+
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.get(
+                    f"{self.base_url}/practice-sessions/user/{user_id}",
+                    headers=headers
+                )
+
+                if response.status_code == 200:
+                    sessions_data = response.json()
+                    return [
+                        PracticeSession(
+                            user_id=session["user_id"],
+                            start_time=datetime.fromisoformat(session["start_time"]),
+                            end_time=datetime.fromisoformat(session["end_time"]),
+                            personas_total=session["personas_total"],
+                            personas_correct=session["personas_correct"],
+                            proceso_total=session["proceso_total"],
+                            proceso_correct=session["proceso_correct"],
+                            entorno_total=session["entorno_total"],
+                            entorno_correct=session["entorno_correct"],
+                            id=session.get("id")
+                        )
+                        for session in sessions_data
+                    ]
+                return []
+        except Exception as e:
+            print(f"Error obteniendo sesiones: {e}")
+            return []
+
     async def save_practice_session(self, session: QuizSession) -> bool:
         """Guarda la sesión de práctica en la base de datos."""
         try:
-            # Verificar que haya un usuario autenticado
             if not self.current_user:
                 return False
 
-            # Obtener estadísticas por dominio
             stats = session.get_stats_by_domain()
 
             headers = {}
             if self.current_user and self.current_user.access_token:
                 headers["Authorization"] = f"Bearer {self.current_user.access_token}"
 
-            # Preparar datos para enviar al API
             session_data = {
-                "user_id": self.current_user.id,  # Agregamos el user_id
+                "user_id": self.current_user.id,
                 "start_time": session.start_time.isoformat(),
                 "end_time": datetime.now().isoformat(),
                 "personas_total": stats.get("personas", {}).get("total", 0),

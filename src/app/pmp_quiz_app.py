@@ -97,7 +97,7 @@ class PMPQuizApp:
         """Muestra la vista de progreso."""
         page = e.page if hasattr(e, 'page') else self.page
         hide_loading(page)
-        self.progress_view.build(page)
+        page.loop.create_task(self.progress_view.build(page))
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""

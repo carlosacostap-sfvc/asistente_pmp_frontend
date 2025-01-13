@@ -80,6 +80,7 @@ class SelectionView:
         self.on_chat_selected(e)
 
     def handle_progress(self, e):
+        """Maneja la navegación a la vista de progreso"""
         self.on_progress_selected(e)
 
     async def handle_logout(self, e):
