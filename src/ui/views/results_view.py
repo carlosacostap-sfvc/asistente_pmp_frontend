@@ -13,6 +13,7 @@ class ResultsView:
         self.page = page
         page.clean()
 
+        # Obtener estadísticas por dominio
         stats = session.get_stats_by_domain()
 
         # Crear estadísticas por dominio
@@ -20,12 +21,20 @@ class ResultsView:
             controls=[
                 ft.Container(
                     content=ft.Column([
-                        ft.Text(f"Dominio: {domain.capitalize()}", size=16, weight=ft.FontWeight.BOLD),
-                        ft.Text(f"Total preguntas: {data['total']}", size=14),
-                        ft.Text(f"Correctas: {data['correct']}", size=14),
+                        ft.Text(f"Dominio: {domain.capitalize()}",
+                               size=16,
+                               weight=ft.FontWeight.BOLD,
+                               color=ft.colors.BLACK),
+                        ft.Text(f"Total preguntas: {data['total']}",
+                               size=14,
+                               color=ft.colors.BLACK),
+                        ft.Text(f"Correctas: {data['correct']}",
+                               size=14,
+                               color=ft.colors.BLACK),
                         ft.Text(
                             f"Porcentaje: {(data['correct'] / data['total'] * 100):.1f}%",
-                            size=14
+                            size=14,
+                            color=ft.colors.BLACK
                         ),
                         ft.ProgressBar(
                             value=data['correct'] / data['total'],
@@ -49,13 +58,19 @@ class ResultsView:
             controls=[
                 ft.Container(
                     content=ft.Column([
-                        ft.Text(f"Pregunta {i + 1}: {answer.question_text}", size=14),
+                        ft.Text(f"Pregunta {i + 1}: {answer.question_text}",
+                                size=14,
+                                color=ft.colors.BLACK),
                         ft.Text(
                             f"Tu respuesta: {answer.selected_option}",
-                            color=ft.colors.GREEN if answer.is_correct else ft.colors.RED
+                            color=ft.colors.GREEN if answer.is_correct else ft.colors.RED,
+                            weight=ft.FontWeight.BOLD
                         ),
-                        ft.Text(f"Respuesta correcta: {answer.correct_option}"),
-                        ft.Text(f"Explicación: {answer.explanation}", size=12, color=ft.colors.GREY_700),
+                        ft.Text(f"Respuesta correcta: {answer.correct_option}",
+                                color=ft.colors.BLACK),
+                        ft.Text(f"Explicación: {answer.explanation}",
+                                size=12,
+                                color=ft.colors.BLACK),
                         ft.Divider()
                     ]),
                     padding=10
@@ -71,7 +86,12 @@ class ResultsView:
                 create_title("Resultados de la Práctica"),
                 domain_results,
                 ft.Divider(),
-                ft.Text("Detalle de respuestas:", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text(
+                    "Detalle de respuestas:",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                    color=ft.colors.BLACK
+                ),
                 answers_list,
                 create_button(
                     text="Volver al inicio",
