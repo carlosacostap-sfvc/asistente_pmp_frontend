@@ -10,8 +10,9 @@ from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
 from src.ui.views.chat_view import ChatView
-from src.ui.components import show_loading, hide_loading, show_error_message
 from src.ui.views.practice_intro_view import PracticeIntroView
+from src.ui.views.answer_view import AnswerView  # Importar la nueva vista
+from src.ui.components import show_loading, hide_loading, show_error_message
 
 
 class PMPQuizApp:
@@ -34,8 +35,10 @@ class PMPQuizApp:
             on_practice=self.handle_practice
         )
         self.question_view = QuestionView(
+            on_answer_submitted=self.handle_answer_submitted
+        )
+        self.answer_view = AnswerView(
             on_next_question=self.handle_next_question,
-            on_return_home=self.show_selection_view,
             on_finish_practice=self.handle_finish_practice
         )
         self.results_view = ResultsView(
@@ -109,12 +112,13 @@ class PMPQuizApp:
                 self.show_main_view(page)
                 return
 
-            # Iniciar nueva sesión
-            self.quiz_session = QuizSession(
-                start_time=datetime.now(),
-                answers=[]
-            )
-            page.quiz_session = self.quiz_session
+            # Iniciar nueva sesión si no existe
+            if not hasattr(page, 'quiz_session'):
+                self.quiz_session = QuizSession(
+                    start_time=datetime.now(),
+                    answers=[]
+                )
+                page.quiz_session = self.quiz_session
 
             # Obtener primera pregunta
             question = await api_service.get_single_question(domain)
@@ -128,6 +132,10 @@ class PMPQuizApp:
             show_error_message(page, f"Error: {str(e)}")
         finally:
             hide_loading(page)
+
+    async def handle_answer_submitted(self, e, question: Question, selected_answer: str, is_correct: bool):
+        """Maneja cuando se envía una respuesta, mostrando la vista de respuesta."""
+        self.answer_view.build(e.page, question, selected_answer, is_correct)
 
     async def handle_next_question(self, e, domain: str):
         """Maneja el evento de siguiente pregunta."""
