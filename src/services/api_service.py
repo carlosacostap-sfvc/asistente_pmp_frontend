@@ -36,8 +36,16 @@ class APIService:
 
                 if response.status_code == 200:
                     data = response.json()
+                    # Obtenemos los datos del usuario
+                    user_response = await client.get(
+                        f"{self.base_url}/auth/me",
+                        headers={"Authorization": f"Bearer {data['access_token']}"}
+                    )
+                    user_data = user_response.json()
+
                     self.current_user = User(
                         email=email,
+                        id=user_data["id"],  # Guardamos el ID del usuario
                         access_token=data["access_token"],
                         is_authenticated=True
                     )
@@ -99,6 +107,10 @@ class APIService:
     async def save_practice_session(self, session: QuizSession) -> bool:
         """Guarda la sesión de práctica en la base de datos."""
         try:
+            # Verificar que haya un usuario autenticado
+            if not self.current_user:
+                return False
+
             # Obtener estadísticas por dominio
             stats = session.get_stats_by_domain()
 
@@ -108,6 +120,7 @@ class APIService:
 
             # Preparar datos para enviar al API
             session_data = {
+                "user_id": self.current_user.id,  # Agregamos el user_id
                 "start_time": session.start_time.isoformat(),
                 "end_time": datetime.now().isoformat(),
                 "personas_total": stats.get("personas", {}).get("total", 0),
