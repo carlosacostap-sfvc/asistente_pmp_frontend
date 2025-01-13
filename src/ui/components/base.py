@@ -54,49 +54,52 @@ def create_container(content: ft.Control, padding: int = 50) -> ft.Container:
     )
 
 def show_loading(page: ft.Page):
-    """Muestra un indicador de carga."""
-    loading_banner = ft.Container(
-        content=ft.Row(
-            controls=[
-                ft.ProgressRing(
-                    width=12,
-                    height=12,
-                    stroke_width=2,
-                    color=ft.colors.BLUE,
+    """Muestra un overlay de carga sobre toda la página."""
+    loading_overlay = ft.Stack(
+        controls=[
+            ft.Container(
+                expand=True,
+                bgcolor=ft.colors.BLACK,
+                opacity=0.3,
+            ),
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.ProgressRing(
+                            width=40,
+                            height=40,
+                            stroke_width=3,
+                            color=ft.colors.BLUE,
+                        ),
+                        ft.Container(height=20),  # Espaciado
+                        ft.Text(
+                            "Cargando...",
+                            size=16,
+                            weight=ft.FontWeight.W_500,
+                            color=ft.colors.WHITE,
+                        ),
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    alignment=ft.MainAxisAlignment.CENTER,
                 ),
-                ft.Text(
-                    "Cargando...",
-                    size=12,
-                    weight=ft.FontWeight.W_500,
-                    color=ft.colors.BLUE_GREY_900,
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=8,
-            tight=True,
-        ),
-        bgcolor=ft.colors.BLUE_50,
-        padding=ft.padding.only(left=16, right=16, top=8, bottom=8),
-        border_radius=4,
-        shadow=ft.BoxShadow(
-            spread_radius=0,
-            blur_radius=4,
-            color=ft.colors.BLACK12,
-            offset=ft.Offset(0, 2),
-        ),
+                alignment=ft.alignment.center,
+                expand=True,
+            ),
+        ],
+        expand=True,
     )
 
-    if hasattr(page, 'loading_banner'):
-        page.controls.remove(page.loading_banner)
-    page.loading_banner = loading_banner
-    page.controls.insert(0, loading_banner)
+    if hasattr(page, 'loading_overlay'):
+        page.controls.remove(page.loading_overlay)
+    page.loading_overlay = loading_overlay
+    page.overlay.append(loading_overlay)
     page.update()
 
 def hide_loading(page: ft.Page):
-    """Oculta el indicador de carga."""
-    if hasattr(page, 'loading_banner'):
-        page.controls.remove(page.loading_banner)
-        delattr(page, 'loading_banner')
+    """Oculta el overlay de carga."""
+    if hasattr(page, 'loading_overlay'):
+        page.overlay.remove(page.loading_overlay)
+        delattr(page, 'loading_overlay')
         page.update()
 
 def show_error_message(page: ft.Page, message: str):
