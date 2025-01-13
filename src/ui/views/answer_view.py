@@ -120,7 +120,7 @@ class AnswerView:
         # Botones de acción
         next_button = create_button(
             text="Siguiente Pregunta",
-            on_click=lambda e: self.handle_next_question(e, domain_dropdown.value),
+            on_click=lambda e: self.page.loop.create_task(self.handle_next_question(e, domain_dropdown.value)),
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
         )
