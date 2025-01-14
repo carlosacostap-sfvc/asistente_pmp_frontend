@@ -5,6 +5,7 @@ from src.models.question import Question
 from src.models.quiz_session import QuizSession
 from src.services.api_service import api_service
 from src.ui.views.auth_view import AuthView
+from src.ui.views.educational_resources_view import EducationalResourcesView
 from src.ui.views.main_view import MainView
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
@@ -31,6 +32,7 @@ class PMPQuizApp:
             on_practice_selected=self.handle_practice_selected,
             on_chat_selected=self.show_chat_view,
             on_progress_selected=self.show_progress_view,
+            on_educational_resources_selected=self.show_educational_resources_view,  # Nuevo
             on_logout=self.handle_logout
         )
         self.progress_view = ProgressView(
@@ -54,6 +56,9 @@ class PMPQuizApp:
         )
         self.practice_intro_view = PracticeIntroView(
             on_start_practice=self.handle_practice
+        )
+        self.educational_resources_view = EducationalResourcesView(
+            on_return_home=self.show_selection_view
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
@@ -98,6 +103,11 @@ class PMPQuizApp:
         page = e.page if hasattr(e, 'page') else self.page
         hide_loading(page)
         page.loop.create_task(self.progress_view.build(page))
+
+    def show_educational_resources_view(self, e):
+        """Muestra la vista de recursos educativos."""
+        page = e.page if hasattr(e, 'page') else self.page
+        self.educational_resources_view.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""

@@ -7,11 +7,13 @@ class SelectionView:
         on_practice_selected,
         on_chat_selected,
         on_progress_selected,
+        on_educational_resources_selected,  # Nuevo callback
         on_logout
     ):
         self.on_practice_selected = on_practice_selected
         self.on_chat_selected = on_chat_selected
         self.on_progress_selected = on_progress_selected
+        self.on_educational_resources_selected = on_educational_resources_selected  # Nuevo
         self.on_logout = on_logout
         self.page = None
 
@@ -23,6 +25,13 @@ class SelectionView:
         page.clean()
 
         # Botones de opción
+        chat_button = create_button(
+            text="Chat con GPT",
+            on_click=self.handle_chat,
+            bgcolor=ft.colors.GREEN,
+            color=ft.colors.WHITE,
+        )
+
         practice_button = create_button(
             text="Práctica PMP",
             on_click=self.handle_practice,
@@ -30,10 +39,10 @@ class SelectionView:
             color=ft.colors.WHITE,
         )
 
-        chat_button = create_button(
-            text="Chat con GPT",
-            on_click=self.handle_chat,
-            bgcolor=ft.colors.GREEN,
+        educational_resources_button = create_button(
+            text="Recursos Educativos",
+            on_click=self.handle_educational_resources,
+            bgcolor=ft.colors.ORANGE,  # Color distintivo
             color=ft.colors.WHITE,
         )
 
@@ -62,6 +71,7 @@ class SelectionView:
                 practice_button,
                 chat_button,
                 progress_button,
+                educational_resources_button,  # Nuevo botón
                 ft.Divider(height=20, color=ft.colors.TRANSPARENT),
                 logout_button,
             ],
@@ -73,11 +83,15 @@ class SelectionView:
         page.add(container)
         page.update()
 
+    def handle_chat(self, e):
+        self.on_chat_selected(e)
+
     async def handle_practice(self, e):
         await self.on_practice_selected(e)
 
-    def handle_chat(self, e):
-        self.on_chat_selected(e)
+    def handle_educational_resources(self, e):
+        """Maneja la navegación a la vista de recursos educativos"""
+        self.on_educational_resources_selected(e)
 
     def handle_progress(self, e):
         """Maneja la navegación a la vista de progreso"""
