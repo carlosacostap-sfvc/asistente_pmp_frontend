@@ -33,7 +33,7 @@ class EducationalResourcesView:
                     ft.TextButton(
                         text="Ver más",
                         icon=ft.icons.ARROW_FORWARD,
-                        on_click=lambda e: self.handle_resource_click(title),
+                        on_click=lambda e: self.handle_pmbok_principles(e) if title == "Guía PMBOK 7ma Edición" else None,
                         style=ft.ButtonStyle(
                             color=ft.colors.BLUE
                         )
@@ -158,3 +158,11 @@ class EducationalResourcesView:
                 action="OK"
             )
         )
+
+    def handle_pmbok_principles(self, e):
+        """Maneja la navegación a la vista de principios del PMBOK"""
+        from src.ui.views.pmbok_principles_view import PMBOKPrinciplesView
+        principles_view = PMBOKPrinciplesView(
+            on_return_to_resources=lambda e: self.build(self.page)
+        )
+        principles_view.build(self.page)
