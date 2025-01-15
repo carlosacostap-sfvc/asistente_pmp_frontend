@@ -166,14 +166,7 @@ class EducationalResourcesView:
 
     def handle_resource_click(self, title: str):
         """Maneja el click en un recurso específico."""
-        if title == "Los 12 Principios de la Gestión de Proyectos":
-            from src.ui.views.management_principles_view import ManagementPrinciplesView
-            principles_view = ManagementPrinciplesView(
-                on_return_to_resources=lambda e: self.build(self.page)
-            )
-            principles_view.build(self.page)
-        else:
-            # Por ahora, mostrar un mensaje para las otras secciones
-            self.page.show_snack_bar(
-                ft.SnackBar(content=ft.Text(f"Próximamente: {title}"))
-            )
+        # Mostrar mensaje "Próximamente" para todas las secciones
+        self.page.show_snack_bar(
+            ft.SnackBar(content=ft.Text(f"Próximamente: {title}"))
+        )
