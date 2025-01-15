@@ -68,6 +68,15 @@ class PMBOKPrinciplesView:
         e.control.scale = ft.transform.Scale(scale=1.02) if e.data == "true" else ft.transform.Scale(scale=1)
         e.control.update()
 
+    def handle_principle_click(self, principle_data: dict):
+        """Maneja el click en un principio específico"""
+        from src.ui.views.management_principles_view import PrincipleDetailView
+        detail_view = PrincipleDetailView(
+            principle=principle_data,
+            on_return_to_principles=lambda e: self.build(self.page)
+        )
+        detail_view.build(self.page)
+
     def build(self, page: ft.Page):
         self.page = page
         page.clean()

@@ -1,1 +1,2 @@
 from .pmbok_principles_view import PMBOKPrinciplesView
+from src.data.principles_data import PRINCIPLES_DATA

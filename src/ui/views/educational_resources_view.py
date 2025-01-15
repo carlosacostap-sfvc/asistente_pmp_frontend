@@ -7,162 +7,173 @@ class EducationalResourcesView:
         self.on_return_home = on_return_home
         self.page = None
 
+    def create_resource_card(self, icon: str, title: str, description: str) -> ft.Container:
+        """Crea una tarjeta de recurso con el nuevo diseño."""
+        return ft.Container(
+            content=ft.Row([
+                # Contenido principal
+                ft.Row([
+                    # Ícono
+                    ft.Container(
+                        content=ft.Icon(icon, size=24, color=ft.colors.BLUE),
+                        margin=ft.margin.only(right=15),
+                    ),
+                    # Textos
+                    ft.Column([
+                        ft.Text(
+                            title,
+                            size=16,
+                            weight=ft.FontWeight.W_500,
+                            color=ft.colors.BLACK,
+                        ),
+                        ft.Text(
+                            description,
+                            size=14,
+                            color=ft.colors.GREY_700,
+                            width=400,
+                        ),
+                    ],
+                    spacing=5,
+                    ),
+                ], expand=True),
+                # Flecha derecha
+                ft.Icon(
+                    ft.icons.ARROW_FORWARD_IOS,
+                    size=20,
+                    color=ft.colors.GREY_400,
+                ),
+            ]),
+            padding=20,
+            bgcolor=ft.colors.WHITE,
+            border_radius=8,
+            border=ft.border.all(1, ft.colors.GREY_200),
+            margin=ft.margin.only(bottom=10),
+            ink=True,
+            on_click=lambda e: self.handle_resource_click(title),
+        )
+
+    def create_section_title(self, text: str) -> ft.Text:
+        """Crea un título de sección."""
+        return ft.Text(
+            text,
+            size=18,
+            weight=ft.FontWeight.BOLD,
+            color=ft.colors.BLACK,
+        )
+
     def build(self, page: ft.Page):
         self.page = page
         page.clean()
         page.scroll = ft.ScrollMode.AUTO
 
-        # Función para crear una tarjeta de recurso con texto en negro
-        def create_resource_card(title: str, description: str, icon: str) -> ft.Container:
-            return ft.Container(
-                content=ft.Column([
-                    ft.Row([
-                        ft.Icon(icon, size=24, color=ft.colors.BLUE),
-                        ft.Text(
-                            title,
-                            size=18,
-                            weight=ft.FontWeight.BOLD,
-                            color=ft.colors.BLACK
-                        )
-                    ], alignment=ft.MainAxisAlignment.START),
-                    ft.Text(
-                        description,
-                        size=14,
-                        color=ft.colors.BLACK
-                    ),
-                    ft.TextButton(
-                        text="Ver más",
-                        icon=ft.icons.ARROW_FORWARD,
-                        on_click=lambda e: self.handle_pmbok_principles(e) if title == "Guía PMBOK 7ma Edición" else None,
-                        style=ft.ButtonStyle(
-                            color=ft.colors.BLUE
-                        )
-                    )
-                ]),
-                padding=20,
-                margin=10,
-                bgcolor=ft.colors.WHITE,
-                border_radius=10,
-                border=ft.border.all(1, ft.colors.BLUE_200),
-                shadow=ft.BoxShadow(
-                    spread_radius=1,
-                    blur_radius=10,
-                    color=ft.colors.BLACK12,
-                )
-            )
-
-        # Guías basadas en PMBOK
-        pmbok_guides = ft.Column([
-            ft.Text(
-                "Guías de Estudio basadas en el PMBOK",
-                size=20,
-                weight=ft.FontWeight.BOLD,
-                color=ft.colors.BLACK
-            ),
-            create_resource_card(
-                "Guía PMBOK 7ma Edición",
-                "Resumen completo de los 12 principios del Project Management según el PMBOK 7",
-                ft.icons.BOOK
-            ),
-            create_resource_card(
-                "Principios de Gestión",
-                "Explicación detallada de cada principio con ejemplos prácticos",
-                ft.icons.LIGHTBULB
-            ),
-        ])
-
-        # Guías basadas en Dominios
-        domain_guides = ft.Column([
-            ft.Text(
-                "Guías de Estudio basadas en los Dominios",
-                size=20,
-                weight=ft.FontWeight.BOLD,
-                color=ft.colors.BLACK
-            ),
-            create_resource_card(
-                "Personas",
-                "Guía completa del dominio de Personas con ejemplos y casos de estudio",
-                ft.icons.PEOPLE
-            ),
-            create_resource_card(
-                "Procesos",
-                "Guía detallada del dominio de Procesos con ejemplos prácticos",
-                ft.icons.ACCOUNT_TREE
-            ),
-            create_resource_card(
-                "Entorno de Negocio",
-                "Guía exhaustiva del dominio de Entorno de Negocio con casos reales",
-                ft.icons.BUSINESS
-            ),
-        ])
-
-        # Recursos en Video
-        video_resources = ft.Column([
-            ft.Text(
-                "Recursos en Video",
-                size=20,
-                weight=ft.FontWeight.BOLD,
-                color=ft.colors.BLACK
-            ),
-            create_resource_card(
-                "Video Tutoriales",
-                "Explicaciones paso a paso de conceptos clave del PMP",
-                ft.icons.PLAY_CIRCLE
-            ),
-            create_resource_card(
-                "Webinars Grabados",
-                "Sesiones con expertos PMP sobre temas específicos",
-                ft.icons.VIDEO_LIBRARY
-            ),
-        ])
-
-        # Botón de retorno
-        return_button = create_button(
-            text="Volver al inicio",
-            on_click=self.on_return_home,
-            bgcolor=ft.colors.BLUE,
-            color=ft.colors.WHITE,
-        )
-
         # Contenido principal
-        content = ft.Column(
-            controls=[
-                create_title("Recursos Educativos"),
-                ft.Text(
-                    "Explora nuestra colección de recursos para prepararte para el examen PMP",
-                    size=16,
-                    color=ft.colors.BLACK,
-                    text_align=ft.TextAlign.CENTER,
-                ),
-                ft.Divider(),
-                pmbok_guides,
-                ft.Divider(),
-                domain_guides,
-                ft.Divider(),
-                video_resources,
-                return_button,
-            ],
-            spacing=20,
-            scroll=ft.ScrollMode.AUTO,
-        )
+        content = ft.Column([
+            # Título y descripción
+            create_title("Recursos Educativos"),
+            ft.Text(
+                "Explora nuestra colección de recursos para prepararte para el examen PMP",
+                size=16,
+                color=ft.colors.GREY_700,
+                weight=ft.FontWeight.W_500,
+            ),
+            ft.Divider(height=30, color=ft.colors.GREY_300),
 
+            # Sección PMBOK 7ma Edición
+            self.create_section_title("Guía de Estudio basada en el PMBOK 7ma Edición"),
+            self.create_resource_card(
+                ft.icons.BOOK_OUTLINED,
+                "Los 12 Principios de la Gestión de Proyectos",
+                "Representan la filosofía de la 7ma edición del PMBOK"
+            ),
+            self.create_resource_card(
+                ft.icons.DASHBOARD_OUTLINED,
+                "Los 8 Dominios de Desempeño",
+                "Grupos interrelacionados de actividades que influyen en la entrega efectiva de resultados"
+            ),
+            self.create_resource_card(
+                ft.icons.SETTINGS_OUTLINED,
+                "Tailoring (Adaptación)",
+                "Adaptación de métodos y enfoques según el contexto del proyecto y la organización"
+            ),
+            self.create_resource_card(
+                ft.icons.ARCHITECTURE_OUTLINED,
+                "Modelos, Métodos y Artefactos",
+                "Para abordar necesidades específicas"
+            ),
+            ft.Divider(height=30, color=ft.colors.GREY_300),
+
+            # Sección Dominios de Evaluación
+            self.create_section_title("Guía de Estudio basada en los Dominios de Evaluación en el Examen PMP"),
+            self.create_resource_card(
+                ft.icons.PEOPLE_OUTLINED,
+                "Personas",
+                "Gestión de equipos y liderazgo"
+            ),
+            self.create_resource_card(
+                ft.icons.ACCOUNT_TREE_OUTLINED,
+                "Procesos",
+                "Metodologías y enfoques de gestión"
+            ),
+            self.create_resource_card(
+                ft.icons.BUSINESS_OUTLINED,
+                "Entorno de Negocio",
+                "Contexto organizacional y entrega de valor"
+            ),
+            ft.Divider(height=30, color=ft.colors.GREY_300),
+
+            # Sección Recursos Complementarios
+            self.create_section_title("Recursos Complementarios"),
+            ft.Text(
+                "Material adicional para tu preparación",
+                size=14,
+                color=ft.colors.GREY_700,
+            ),
+            self.create_resource_card(
+                ft.icons.PLAY_CIRCLE_OUTLINE_OUTLINED,
+                "Video Tutoriales",
+                "Explicaciones paso a paso de conceptos clave"
+            ),
+            self.create_resource_card(
+                ft.icons.VIDEO_LIBRARY_OUTLINED,
+                "Webinars Grabados",
+                "Sesiones con expertos PMP"
+            ),
+
+            # Botón de retorno
+            ft.Container(
+                content=ft.Row([
+                    ft.IconButton(
+                        icon=ft.icons.ARROW_BACK,
+                        icon_color=ft.colors.BLUE,
+                        on_click=self.on_return_home,
+                    ),
+                    ft.Text(
+                        "Volver al Inicio",
+                        color=ft.colors.BLUE,
+                        weight=ft.FontWeight.W_500,
+                        size=16,
+                    ),
+                ]),
+                on_click=self.on_return_home,
+                ink=True,
+            ),
+        ], spacing=10)
+
+        # Contenedor principal
         container = create_container(content)
         page.add(container)
         page.update()
 
-    def handle_resource_click(self, resource_title: str):
-        """Maneja el click en un recurso específico"""
-        self.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Text(f"Próximamente: {resource_title}"),
-                action="OK"
+    def handle_resource_click(self, title: str):
+        """Maneja el click en un recurso específico."""
+        if title == "Los 12 Principios de la Gestión de Proyectos":
+            from src.ui.views.management_principles_view import ManagementPrinciplesView
+            principles_view = ManagementPrinciplesView(
+                on_return_to_resources=lambda e: self.build(self.page)
             )
-        )
-
-    def handle_pmbok_principles(self, e):
-        """Maneja la navegación a la vista de principios del PMBOK"""
-        from src.ui.views.pmbok_principles_view import PMBOKPrinciplesView
-        principles_view = PMBOKPrinciplesView(
-            on_return_to_resources=lambda e: self.build(self.page)
-        )
-        principles_view.build(self.page)
+            principles_view.build(self.page)
+        else:
+            # Por ahora, mostrar un mensaje para las otras secciones
+            self.page.show_snack_bar(
+                ft.SnackBar(content=ft.Text(f"Próximamente: {title}"))
+            )
