@@ -15,6 +15,7 @@ from src.ui.views.practice_intro_view import PracticeIntroView
 from src.ui.views.answer_view import AnswerView
 from src.ui.components import show_loading, hide_loading, show_error_message
 from src.ui.views.progress_view import ProgressView
+from src.ui.views.principles_view import PrinciplesView
 
 
 class PMPQuizApp:
@@ -32,7 +33,7 @@ class PMPQuizApp:
             on_practice_selected=self.handle_practice_selected,
             on_chat_selected=self.show_chat_view,
             on_progress_selected=self.show_progress_view,
-            on_educational_resources_selected=self.show_educational_resources_view,  # Nuevo
+            on_educational_resources_selected=self.show_educational_resources_view,
             on_logout=self.handle_logout
         )
         self.progress_view = ProgressView(
@@ -57,8 +58,12 @@ class PMPQuizApp:
         self.practice_intro_view = PracticeIntroView(
             on_start_practice=self.handle_practice
         )
-        self.educational_resources_view = EducationalResourcesView(
+        self.principles_view = PrinciplesView(
             on_return_home=self.show_selection_view
+        )
+        self.educational_resources_view = EducationalResourcesView(
+            on_return_home=self.show_selection_view,
+            on_principles_selected=self.show_principles_view
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
@@ -108,6 +113,11 @@ class PMPQuizApp:
         """Muestra la vista de recursos educativos."""
         page = e.page if hasattr(e, 'page') else self.page
         self.educational_resources_view.build(page)
+
+    def show_principles_view(self, e):
+        """Muestra la vista de principios."""
+        page = e.page if hasattr(e, 'page') else self.page
+        self.principles_view.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""

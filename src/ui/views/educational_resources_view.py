@@ -1,13 +1,14 @@
 import flet as ft
-from typing import Callable
+from typing import Callable, Optional
 from src.ui.components import create_title, create_container, create_button
 
 class EducationalResourcesView:
-    def __init__(self, on_return_home: Callable):
+    def __init__(self, on_return_home: Callable, on_principles_selected: Optional[Callable] = None):
         self.on_return_home = on_return_home
+        self.on_principles_selected = on_principles_selected
         self.page = None
 
-    def create_resource_card(self, icon: str, title: str, description: str) -> ft.Container:
+    def create_resource_card(self, icon: str, title: str, description: str, on_click=None) -> ft.Container:
         """Crea una tarjeta de recurso con el nuevo diseño."""
         return ft.Container(
             content=ft.Row([
@@ -49,7 +50,7 @@ class EducationalResourcesView:
             border=ft.border.all(1, ft.colors.GREY_200),
             margin=ft.margin.only(bottom=10),
             ink=True,
-            on_click=lambda e: self.handle_resource_click(title),
+            on_click=on_click,
         )
 
     def create_section_title(self, text: str) -> ft.Text:
@@ -81,9 +82,10 @@ class EducationalResourcesView:
             # Sección PMBOK 7ma Edición
             self.create_section_title("Guía de Estudio basada en el PMBOK 7ma Edición"),
             self.create_resource_card(
-                ft.icons.BOOK_OUTLINED,
+                ft.icons.RULE_FOLDER,
                 "Los 12 Principios de la Gestión de Proyectos",
-                "Representan la filosofía de la 7ma edición del PMBOK"
+                "Principios fundamentales que representan la filosofía del PMBOK 7",
+                on_click=lambda e: self.on_principles_selected(e) if hasattr(self, 'on_principles_selected') else None
             ),
             self.create_resource_card(
                 ft.icons.DASHBOARD_OUTLINED,
@@ -105,7 +107,7 @@ class EducationalResourcesView:
             # Sección Dominios de Evaluación
             self.create_section_title("Guía de Estudio basada en los Dominios de Evaluación en el Examen PMP"),
             self.create_resource_card(
-                ft.icons.PEOPLE_OUTLINED,
+                ft.icons.PEOPLE_OUTLINE,
                 "Personas",
                 "Gestión de equipos y liderazgo"
             ),
