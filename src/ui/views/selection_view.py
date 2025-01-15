@@ -7,78 +7,140 @@ class SelectionView:
         on_practice_selected,
         on_chat_selected,
         on_progress_selected,
-        on_educational_resources_selected,  # Nuevo callback
+        on_educational_resources_selected,
         on_logout
     ):
         self.on_practice_selected = on_practice_selected
         self.on_chat_selected = on_chat_selected
         self.on_progress_selected = on_progress_selected
-        self.on_educational_resources_selected = on_educational_resources_selected  # Nuevo
+        self.on_educational_resources_selected = on_educational_resources_selected
         self.on_logout = on_logout
         self.page = None
 
+    def create_option_card(self, icon: str, title: str, description: str, on_click) -> ft.Container:
+        """Crea una tarjeta de opción con el nuevo diseño."""
+        return ft.Container(
+            content=ft.Row([
+                # Contenido principal
+                ft.Row([
+                    # Ícono
+                    ft.Container(
+                        content=ft.Icon(icon, size=24, color=ft.colors.BLUE),
+                        margin=ft.margin.only(right=15),
+                    ),
+                    # Textos
+                    ft.Column([
+                        ft.Text(
+                            title,
+                            size=16,
+                            weight=ft.FontWeight.W_500,
+                            color=ft.colors.BLACK,
+                        ),
+                        ft.Text(
+                            description,
+                            size=14,
+                            color=ft.colors.GREY_700,
+                            width=400,
+                        ),
+                    ],
+                    spacing=5,
+                    ),
+                ], expand=True),
+                # Flecha derecha
+                ft.Icon(
+                    ft.icons.ARROW_FORWARD_IOS,
+                    size=20,
+                    color=ft.colors.GREY_400,
+                ),
+            ]),
+            padding=20,
+            bgcolor=ft.colors.WHITE,
+            border_radius=8,
+            border=ft.border.all(1, ft.colors.GREY_200),
+            margin=ft.margin.only(bottom=10),
+            ink=True,
+            on_click=on_click,
+            shadow=ft.BoxShadow(
+                spread_radius=1,
+                blur_radius=4,
+                color=ft.colors.BLACK12,
+                offset=ft.Offset(0, 2),
+            ),
+        )
+
+    def create_section_title(self, text: str) -> ft.Text:
+        """Crea un título de sección."""
+        return ft.Text(
+            text,
+            size=18,
+            weight=ft.FontWeight.BOLD,
+            color=ft.colors.BLACK,
+        )
+
     def build(self, page: ft.Page):
         self.page = page
-        page.title = "Selección de Modo"
-        page.vertical_alignment = ft.MainAxisAlignment.CENTER
-        page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         page.clean()
+        page.scroll = ft.ScrollMode.AUTO
+        page.padding = 40
+        page.bgcolor = ft.colors.GREY_50
 
-        # Botones de opción
-        chat_button = create_button(
-            text="Chat con GPT",
-            on_click=self.handle_chat,
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
-        )
+        # Contenido principal
+        content = ft.Column([
+            # Título y descripción
+            create_title("PMP Question Generator"),
+            ft.Text(
+                "Selecciona una opción para comenzar tu preparación",
+                size=16,
+                color=ft.colors.GREY_700,
+                weight=ft.FontWeight.W_500,
+            ),
+            ft.Divider(height=30, color=ft.colors.GREY_300),
 
-        practice_button = create_button(
-            text="Práctica PMP",
-            on_click=self.handle_practice,
-            bgcolor=ft.colors.BLUE,
-            color=ft.colors.WHITE,
-        )
+            # Sección Práctica y Aprendizaje
+            self.create_section_title("Práctica y Aprendizaje"),
+            self.create_option_card(
+                ft.icons.QUIZ_OUTLINED,
+                "Práctica PMP",
+                "Pon a prueba tus conocimientos con preguntas de práctica",
+                lambda e: self.page.loop.create_task(self.handle_practice(e))
+            ),
+            self.create_option_card(
+                ft.icons.CHAT_OUTLINED,
+                "Chat con GPT",
+                "Resuelve tus dudas con nuestro asistente virtual",
+                self.handle_chat
+            ),
 
-        educational_resources_button = create_button(
-            text="Recursos Educativos",
-            on_click=self.handle_educational_resources,
-            bgcolor=ft.colors.ORANGE,  # Color distintivo
-            color=ft.colors.WHITE,
-        )
+            ft.Divider(height=30, color=ft.colors.GREY_300),
 
-        progress_button = create_button(
-            text="Mi Progreso",
-            on_click=self.handle_progress,
-            bgcolor=ft.colors.PURPLE,
-            color=ft.colors.WHITE,
-        )
+            # Sección Recursos y Seguimiento
+            self.create_section_title("Recursos y Seguimiento"),
+            self.create_option_card(
+                ft.icons.TRENDING_UP,
+                "Mi Progreso",
+                "Visualiza y analiza tu avance en la preparación",
+                self.handle_progress
+            ),
+            self.create_option_card(
+                ft.icons.SCHOOL_OUTLINED,
+                "Recursos Educativos",
+                "Accede a material de estudio y guías de preparación",
+                self.handle_educational_resources
+            ),
 
-        logout_button = create_button(
-            text="Cerrar Sesión",
-            on_click=self.handle_logout,
-            bgcolor=ft.colors.RED,
-            color=ft.colors.WHITE,
-        )
+            ft.Divider(height=30, color=ft.colors.GREY_300),
 
-        content = ft.Column(
-            controls=[
-                create_title("¿Qué te gustaría hacer?"),
-                ft.Text(
-                    "Selecciona una opción para continuar",
-                    size=16,
-                    color=ft.colors.BLUE_GREY_700,
-                ),
-                practice_button,
-                chat_button,
-                progress_button,
-                educational_resources_button,  # Nuevo botón
-                ft.Divider(height=20, color=ft.colors.TRANSPARENT),
-                logout_button,
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20,
-        )
+            # Sección Cuenta
+            self.create_section_title("Cuenta"),
+            self.create_option_card(
+                ft.icons.LOGOUT,
+                "Cerrar Sesión",
+                "Finaliza tu sesión actual",
+                lambda e: self.page.loop.create_task(self.handle_logout(e))
+            ),
+        ])
 
+        # Contenedor principal con sombra y bordes redondeados
         container = create_container(content)
         page.add(container)
         page.update()
@@ -89,13 +151,11 @@ class SelectionView:
     async def handle_practice(self, e):
         await self.on_practice_selected(e)
 
-    def handle_educational_resources(self, e):
-        """Maneja la navegación a la vista de recursos educativos"""
-        self.on_educational_resources_selected(e)
-
     def handle_progress(self, e):
-        """Maneja la navegación a la vista de progreso"""
         self.on_progress_selected(e)
+
+    def handle_educational_resources(self, e):
+        self.on_educational_resources_selected(e)
 
     async def handle_logout(self, e):
         await self.on_logout(e)
