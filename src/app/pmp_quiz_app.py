@@ -7,7 +7,10 @@ from src.services.api_service import api_service
 from src.ui.views.auth_view import AuthView
 from src.ui.views.educational_resources_view import EducationalResourcesView
 from src.ui.views.main_view import MainView
+from src.ui.views.principle_detail_view import PrincipleDetailView
 from src.ui.views.principle_detail_view_2 import PrincipleDetailView2
+from src.ui.views.principle_detail_view_3 import PrincipleDetailView3
+from src.ui.views.principle_detail_view_4 import PrincipleDetailView4
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
@@ -17,8 +20,6 @@ from src.ui.views.answer_view import AnswerView
 from src.ui.components import show_loading, hide_loading, show_error_message
 from src.ui.views.progress_view import ProgressView
 from src.ui.views.principles_view import PrinciplesView
-from src.ui.views.principle_detail_view import PrincipleDetailView
-
 
 class PMPQuizApp:
     def __init__(self):
@@ -63,6 +64,15 @@ class PMPQuizApp:
         self.principle_detail_view = PrincipleDetailView(
             on_return_to_principles=self.show_principles_view
         )
+        self.principle_detail_view_2 = PrincipleDetailView2(
+            on_return_to_principles=self.show_principles_view
+        )
+        self.principle_detail_view_3 = PrincipleDetailView3(
+            on_return_to_principles=self.show_principles_view
+        )
+        self.principle_detail_view_4 = PrincipleDetailView4(
+            on_return_to_principles=self.show_principles_view
+        )
         self.principles_view = PrinciplesView(
             on_return_home=self.show_selection_view,
             on_principle_detail=self.show_principle_detail
@@ -70,9 +80,6 @@ class PMPQuizApp:
         self.educational_resources_view = EducationalResourcesView(
             on_return_home=self.show_selection_view,
             on_principles_selected=self.show_principles_view
-        )
-        self.principle_detail_view_2 = PrincipleDetailView2(
-            on_return_to_principles=self.show_principles_view
         )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
@@ -135,6 +142,10 @@ class PMPQuizApp:
             self.principle_detail_view.build(page)
         elif principle_number == 2:
             self.principle_detail_view_2.build(page)
+        elif principle_number == 3:
+            self.principle_detail_view_3.build(page)
+        elif principle_number == 4:
+            self.principle_detail_view_4.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""

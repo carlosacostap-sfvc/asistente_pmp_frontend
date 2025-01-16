@@ -31,14 +31,14 @@ class PrinciplesView:
                 "title": "Involucrar a los interesados",
                 "description": "Gestiona expectativas y comunicación",
                 "icon": ft.icons.PEOPLE_OUTLINE,
-                "has_detail": False
+                "has_detail": True
             },
             {
                 "number": 4,
                 "title": "Enfocarse en el valor",
                 "description": "Prioriza la entrega de beneficios",
                 "icon": ft.icons.TRENDING_UP,
-                "has_detail": False
+                "has_detail": True
             },
             {
                 "number": 5,
