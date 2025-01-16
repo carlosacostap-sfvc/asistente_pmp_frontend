@@ -17,73 +17,84 @@ class PrinciplesView:
                 "title": "Ser un administrador diligente",
                 "description": "Demuestra comportamiento ético y responsable",
                 "icon": ft.icons.ADMIN_PANEL_SETTINGS,
-                "has_detail": True  # Solo el primer principio tiene vista detallada por ahora
+                "has_detail": True
             },
             {
                 "number": 2,
                 "title": "Crear un ambiente colaborativo",
                 "description": "Fomenta el trabajo en equipo efectivo",
-                "icon": ft.icons.GROUP_WORK
+                "icon": ft.icons.GROUP_WORK,
+                "has_detail": True
             },
             {
                 "number": 3,
                 "title": "Involucrar a los interesados",
                 "description": "Gestiona expectativas y comunicación",
-                "icon": ft.icons.PEOPLE_OUTLINE
+                "icon": ft.icons.PEOPLE_OUTLINE,
+                "has_detail": False
             },
             {
                 "number": 4,
                 "title": "Enfocarse en el valor",
                 "description": "Prioriza la entrega de beneficios",
-                "icon": ft.icons.TRENDING_UP
+                "icon": ft.icons.TRENDING_UP,
+                "has_detail": False
             },
             {
                 "number": 5,
                 "title": "Reconocer interacciones del sistema",
                 "description": "Gestiona dependencias e impactos",
-                "icon": ft.icons.HUB
+                "icon": ft.icons.HUB,
+                "has_detail": False
             },
             {
                 "number": 6,
                 "title": "Demostrar liderazgo",
                 "description": "Guía y motiva al equipo",
-                "icon": ft.icons.EMOJI_EVENTS
+                "icon": ft.icons.EMOJI_EVENTS,
+                "has_detail": False
             },
             {
                 "number": 7,
                 "title": "Adaptar según el contexto",
                 "description": "Ajusta el enfoque según necesidades",
-                "icon": ft.icons.TUNE
+                "icon": ft.icons.TUNE,
+                "has_detail": False
             },
             {
                 "number": 8,
                 "title": "Incorporar la calidad",
                 "description": "Asegura estándares en entregables",
-                "icon": ft.icons.VERIFIED
+                "icon": ft.icons.VERIFIED,
+                "has_detail": False
             },
             {
                 "number": 9,
                 "title": "Navegar en la complejidad",
                 "description": "Gestiona situaciones complejas",
-                "icon": ft.icons.ACCOUNT_TREE
+                "icon": ft.icons.ACCOUNT_TREE,
+                "has_detail": False
             },
             {
                 "number": 10,
                 "title": "Optimizar respuestas a riesgos",
                 "description": "Gestiona amenazas y oportunidades",
-                "icon": ft.icons.SECURITY
+                "icon": ft.icons.SECURITY,
+                "has_detail": False
             },
             {
                 "number": 11,
                 "title": "Adoptar adaptabilidad",
                 "description": "Mantiene flexibilidad ante cambios",
-                "icon": ft.icons.AUTO_MODE
+                "icon": ft.icons.AUTO_MODE,
+                "has_detail": False
             },
             {
                 "number": 12,
                 "title": "Permitir el cambio",
                 "description": "Facilita la transición efectiva",
-                "icon": ft.icons.CHANGE_CIRCLE
+                "icon": ft.icons.CHANGE_CIRCLE,
+                "has_detail": False
             }
         ]
 
@@ -142,7 +153,7 @@ class PrinciplesView:
             ) if principle.get("has_detail") else ft.Container(),
         ])
 
-        return ft.Container(
+        container = ft.Container(
             content=content,
             padding=20,
             bgcolor=ft.colors.WHITE,
@@ -150,7 +161,7 @@ class PrinciplesView:
             border=ft.border.all(1, ft.colors.GREY_200),
             margin=ft.margin.only(bottom=10),
             ink=True if principle.get("has_detail") else False,
-            on_click=lambda e: self.handle_principle_click(e, principle) if principle.get("has_detail") else None,
+            on_click=lambda e, p=principle: self.handle_principle_click(e, p) if p.get("has_detail") else None,
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=4,
@@ -158,6 +169,29 @@ class PrinciplesView:
                 offset=ft.Offset(0, 2),
             ),
         )
+
+        # Si el principio no tiene detalle, agregar un mensaje de "próximamente"
+        if not principle.get("has_detail"):
+            container = ft.Container(
+                content=ft.Stack([
+                    container,
+                    ft.Container(
+                        content=ft.Text(
+                            "Próximamente",
+                            size=12,
+                            color=ft.colors.WHITE,
+                            weight=ft.FontWeight.W_500,
+                            text_align=ft.TextAlign.CENTER,
+                        ),
+                        bgcolor=ft.colors.GREY_700,
+                        border_radius=5,
+                        padding=ft.padding.all(5),
+                        alignment=ft.alignment.center,
+                    ),
+                ]),
+            )
+
+        return container
 
     def handle_principle_click(self, e, principle: dict):
         """Maneja el clic en un principio."""

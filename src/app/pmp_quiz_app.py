@@ -7,6 +7,7 @@ from src.services.api_service import api_service
 from src.ui.views.auth_view import AuthView
 from src.ui.views.educational_resources_view import EducationalResourcesView
 from src.ui.views.main_view import MainView
+from src.ui.views.principle_detail_view_2 import PrincipleDetailView2
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
@@ -70,6 +71,9 @@ class PMPQuizApp:
             on_return_home=self.show_selection_view,
             on_principles_selected=self.show_principles_view
         )
+        self.principle_detail_view_2 = PrincipleDetailView2(
+            on_return_to_principles=self.show_principles_view
+        )
 
     def show_main_view(self, page: Optional[ft.Page] = None):
         """Muestra la vista principal o la vista de autenticación según corresponda."""
@@ -127,7 +131,10 @@ class PMPQuizApp:
     def show_principle_detail(self, e, principle_number: int):
         """Muestra la vista detallada de un principio específico."""
         page = e.page if hasattr(e, 'page') else self.page
-        self.principle_detail_view.build(page)
+        if principle_number == 1:
+            self.principle_detail_view.build(page)
+        elif principle_number == 2:
+            self.principle_detail_view_2.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""
