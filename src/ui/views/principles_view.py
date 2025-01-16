@@ -1,17 +1,23 @@
 import flet as ft
-from typing import Callable
+from typing import Callable, Optional
 from src.ui.components import create_title, create_container
 
 class PrinciplesView:
-    def __init__(self, on_return_home: Callable):
+    def __init__(
+        self,
+        on_return_home: Callable,
+        on_principle_detail: Optional[Callable] = None
+    ):
         self.on_return_home = on_return_home
+        self.on_principle_detail = on_principle_detail
         self.page = None
         self.principles = [
             {
                 "number": 1,
                 "title": "Ser un administrador diligente",
                 "description": "Demuestra comportamiento ético y responsable",
-                "icon": ft.icons.ADMIN_PANEL_SETTINGS
+                "icon": ft.icons.ADMIN_PANEL_SETTINGS,
+                "has_detail": True  # Solo el primer principio tiene vista detallada por ahora
             },
             {
                 "number": 2,
@@ -83,40 +89,68 @@ class PrinciplesView:
 
     def create_principle_card(self, principle: dict) -> ft.Container:
         """Crea una tarjeta para un principio con el estilo de la aplicación."""
-        return ft.Container(
-            content=ft.Row([
-                ft.Row([
-                    ft.Container(
-                        content=ft.Icon(
+        content = ft.Row([
+            # Contenido principal
+            ft.Row([
+                # Ícono y número
+                ft.Container(
+                    content=ft.Stack([
+                        ft.Icon(
                             principle["icon"],
                             size=24,
                             color=ft.colors.BLUE
                         ),
-                        margin=ft.margin.only(right=15),
+                        ft.Container(
+                            content=ft.Text(
+                                str(principle["number"]),
+                                size=12,
+                                color=ft.colors.WHITE,
+                                weight=ft.FontWeight.BOLD,
+                            ),
+                            bgcolor=ft.colors.BLUE,
+                            border_radius=8,
+                            padding=5,
+                            margin=ft.margin.only(left=20, top=20),
+                        )
+                    ]),
+                    width=48,
+                    height=48,
+                ),
+                # Textos
+                ft.Column([
+                    ft.Text(
+                        principle["title"],
+                        size=16,
+                        weight=ft.FontWeight.W_500,
+                        color=ft.colors.BLACK,
                     ),
-                    ft.Column([
-                        ft.Text(
-                            f"{principle['number']}. {principle['title']}",
-                            size=16,
-                            weight=ft.FontWeight.W_500,
-                            color=ft.colors.BLACK,
-                        ),
-                        ft.Text(
-                            principle["description"],
-                            size=14,
-                            color=ft.colors.GREY_700,
-                            width=400,
-                        ),
-                    ],
-                    spacing=5,
+                    ft.Text(
+                        principle["description"],
+                        size=14,
+                        color=ft.colors.GREY_700,
                     ),
-                ], expand=True),
-            ]),
+                ],
+                spacing=5,
+                expand=True,
+                ),
+            ], expand=True),
+            # Flecha derecha (solo si tiene vista detallada)
+            ft.Icon(
+                ft.icons.ARROW_FORWARD_IOS,
+                size=20,
+                color=ft.colors.GREY_400,
+            ) if principle.get("has_detail") else ft.Container(),
+        ])
+
+        return ft.Container(
+            content=content,
             padding=20,
             bgcolor=ft.colors.WHITE,
             border_radius=8,
             border=ft.border.all(1, ft.colors.GREY_200),
             margin=ft.margin.only(bottom=10),
+            ink=True if principle.get("has_detail") else False,
+            on_click=lambda e: self.handle_principle_click(e, principle) if principle.get("has_detail") else None,
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=4,
@@ -125,6 +159,11 @@ class PrinciplesView:
             ),
         )
 
+    def handle_principle_click(self, e, principle: dict):
+        """Maneja el clic en un principio."""
+        if principle.get("has_detail") and self.on_principle_detail:
+            self.on_principle_detail(e, principle["number"])
+
     def build(self, page: ft.Page):
         self.page = page
         page.clean()
@@ -132,10 +171,12 @@ class PrinciplesView:
         page.padding = 40
         page.bgcolor = ft.colors.GREY_50
 
+        # Contenido principal
         content = ft.Column([
-            create_title("Los 12 Principios de la Gestión de Proyectos"),
+            # Título y descripción
+            create_title("Los 12 Principios del PMBOK 7"),
             ft.Text(
-                "Fundamentos del PMBOK 7ma Edición",
+                "Fundamentos esenciales para la gestión efectiva de proyectos",
                 size=16,
                 color=ft.colors.GREY_700,
                 weight=ft.FontWeight.W_500,
@@ -143,7 +184,10 @@ class PrinciplesView:
             ft.Divider(height=30, color=ft.colors.GREY_300),
 
             # Lista de principios
-            *[self.create_principle_card(principle) for principle in self.principles],
+            ft.Column([
+                self.create_principle_card(principle)
+                for principle in self.principles
+            ], spacing=10),
 
             # Botón de retorno
             ft.Container(
@@ -165,6 +209,7 @@ class PrinciplesView:
             ),
         ])
 
+        # Contenedor principal
         container = create_container(content)
         page.add(container)
         page.update()
