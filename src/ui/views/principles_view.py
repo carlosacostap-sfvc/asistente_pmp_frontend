@@ -45,7 +45,7 @@ class PrinciplesView:
                 "title": "Reconocer interacciones del sistema",
                 "description": "Gestiona dependencias e impactos",
                 "icon": ft.icons.HUB,
-                "has_detail": False
+                "has_detail": True
             },
             {
                 "number": 6,

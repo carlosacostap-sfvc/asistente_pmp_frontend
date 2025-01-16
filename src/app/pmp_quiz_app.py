@@ -11,6 +11,7 @@ from src.ui.views.principle_detail_view import PrincipleDetailView
 from src.ui.views.principle_detail_view_2 import PrincipleDetailView2
 from src.ui.views.principle_detail_view_3 import PrincipleDetailView3
 from src.ui.views.principle_detail_view_4 import PrincipleDetailView4
+from src.ui.views.principle_detail_view_5 import PrincipleDetailView5
 from src.ui.views.question_view import QuestionView
 from src.ui.views.results_view import ResultsView
 from src.ui.views.selection_view import SelectionView
@@ -71,6 +72,9 @@ class PMPQuizApp:
             on_return_to_principles=self.show_principles_view
         )
         self.principle_detail_view_4 = PrincipleDetailView4(
+            on_return_to_principles=self.show_principles_view
+        )
+        self.principle_detail_view_5 = PrincipleDetailView5(
             on_return_to_principles=self.show_principles_view
         )
         self.principles_view = PrinciplesView(
@@ -146,6 +150,8 @@ class PMPQuizApp:
             self.principle_detail_view_3.build(page)
         elif principle_number == 4:
             self.principle_detail_view_4.build(page)
+        elif principle_number == 5:
+            self.principle_detail_view_5.build(page)
 
     async def handle_login_success(self, e):
         """Maneja el evento de login exitoso."""
